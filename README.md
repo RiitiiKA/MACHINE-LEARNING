@@ -1,1 +1,2 @@
-# MACHINE-LEARNING
+# Fraud detection system
+using semi supervised learning model
