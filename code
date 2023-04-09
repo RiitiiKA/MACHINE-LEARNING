@@ -1,0 +1,28 @@
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import IsolationForest
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix, classification_report
+
+# Load the dataset
+data = pd.read_csv('credit_card_transactions.csv')
+
+# Split the data into training and testing sets
+train_data, test_data = train_test_split(data, test_size=0.2, random_state=42)
+
+# Split the training data into labeled and unlabeled data
+fraud_data = train_data[train_data['Class'] == 1]
+labeled_data, unlabeled_data = train_test_split(fraud_data, test_size=0.5, random_state=42)
+
+# Train the model on the labeled data
+model = IsolationForest(n_estimators=100, contamination='auto', random_state=42)
+model.fit(labeled_data.drop('Class', axis=1))
+
+# Predict the labels of the unlabeled data
+unlabeled_labels = model.predict(unlabeled_data.drop('Class', axis=1))
+unlabeled_data['Pred_Class'] = unlabeled_labels
+
+# Evaluate the model on the testing data
+test_labels = model.predict(test_data.drop('Class', axis=1))
+test_data['Pred_Class'] = test_labels
+print(classification_report(test_data['Class'], test_data['Pred_Class']))
